@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: AWS SES CloudFormation Template for SES creation
+
+Resources:
+  SESConfigurationSet:
+    Type: AWS::SES::ConfigurationSet
+    Properties:
+      Name: MyConfigurationSet
+      TrackingOptions:
+        - CustomRedirectDomain: benchmarkeducation.com
+      DeliveryOptions:
+        TlsPolicy: Optional
+      ReputationOptions:
+        ReputationMetricsEnabled: true
+        LastFreshStart: 2015-01-01T00:00:00Z
+        SendingEnabled: true
+        BehaviorOnMxFailure: UseDefaultValue
+      SendingOptions:
+        SendingEnabled: true
+        FromEmailAddress: boc@benchmarkeducation.com
+
+  SESDomainIdentity:
+    Type: AWS::SES::DomainIdentity
+    Properties:
+      Domain: benchmarkeducation.com
+
+  SESDKIM:
+    Type: AWS::SES::IdentityDkim
+    Properties:
+      IdentityRef: !Ref SESDomainIdentity
+
+  SESTemplate:
+    Type: AWS::SES::Template
+    Properties:
+      Template: 
+        TemplateName: MyEmailTemplate
+        SubjectPart: Welcome to My App
+        HtmlPart: "<h1>Hello {{name}},</h1><p>Welcome to our app!</p>"
+        TextPart: "Hello {{name}}, Welcome to our app!"
+
+Outputs:
+  SESConfigurationSetArn:
+    Description: The ARN of the SES configuration set.
+    Value: !Ref SESConfigurationSet
+  SESDomainIdentityArn:
+    Description: The ARN of the SES domain identity.
+    Value: !Ref SESDomainIdentity
+  SESDKIMArn:
+    Description: The ARN of the SES DKIM identity.
+    Value: !Ref SESDKIM
+  SESVerificationRecordValue:
+    Description: The verification record value for the SES domain identity.
+    Value: !GetAtt SESVerificationRecord.VerificationToken
+  SESTemplateArn:
+    Description: The ARN of the SES email template.
+    Value: !Ref SESTemplate
