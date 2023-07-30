@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: AWS SES CloudFormation Template
+
+Resources:
+  SESConfigurationSet:
+    Type: AWS::SES::ConfigurationSet
+    Properties:
+      Name: MyConfigurationSet
+
+  SESIdentityPolicy:
+    Type: AWS::SES::IdentityPolicy
+    Properties:
+      Identity: "*"
+      PolicyName: SESIdentityPolicy
+      Policy:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - ses:SendEmail
+              - ses:SendRawEmail
+            Resource: "*"
+
+Outputs:
+  SESConfigurationSetArn:
+    Description: The ARN of the SES configuration set.
+    Value: !Ref SESConfigurationSet
